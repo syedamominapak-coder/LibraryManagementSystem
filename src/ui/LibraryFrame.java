@@ -22,11 +22,13 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -39,6 +41,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import model.Book;
 import model.BookStatus;
 import service.LibraryException;
@@ -60,14 +63,14 @@ public class LibraryFrame extends JFrame {
     /** In-memory business logic used by all buttons. */
     private final LibraryService service = new LibraryService();
     /** Input field for the unique book ID. */
-    private final JTextField idField = new JTextField(12);
+    private final ThemedTextField idField = new ThemedTextField(12);
     /** Input field for the book title. */
-    private final JTextField titleField = new JTextField(20);
+    private final ThemedTextField titleField = new ThemedTextField(20);
     /** Input field for the book author. */
-    private final JTextField authorField = new JTextField(20);
+    private final ThemedTextField authorField = new ThemedTextField(20);
     /** Combo box for choosing AVAILABLE, ISSUED or RESERVED. */
-    private final JComboBox<BookStatus> statusCombo =
-            new JComboBox<>(BookStatus.values());
+    private final ThemedComboBox<BookStatus> statusCombo =
+            new ThemedComboBox<>(BookStatus.values());
     /** Read-only data model behind the book table. */
     private final DefaultTableModel tableModel = new DefaultTableModel(
             new String[]{"ID", "Title", "Author", "Status"}, 0) {
@@ -90,7 +93,7 @@ public class LibraryFrame extends JFrame {
     /** Centred message shown when the table has no rows. */
     private final JLabel emptyLabel = new JLabel("Library is empty", SwingConstants.CENTER);
     /** Text field that filters the table as the user types. */
-    private final JTextField searchField = new JTextField(18);
+    private final ThemedTextField searchField = new ThemedTextField(18);
     /** Slim bar showing the last success or error message. */
     private final JLabel statusBar = new JLabel("Ready");
     /** Adds a new book. */
@@ -193,10 +196,7 @@ public class LibraryFrame extends JFrame {
         titleField.setPreferredSize(fieldSize);
         authorField.setPreferredSize(fieldSize);
         statusCombo.setPreferredSize(fieldSize);
-        idField.setFont(Theme.FONT);
-        titleField.setFont(Theme.FONT);
-        authorField.setFont(Theme.FONT);
-        statusCombo.setFont(Theme.FONT);
+        searchField.setPreferredSize(new Dimension(0, 30));
 
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(10, Theme.PAD, 10, Theme.PAD);
@@ -216,6 +216,21 @@ public class LibraryFrame extends JFrame {
         addLabelledField(panel, c, 0, 2, "Title:", titleField);
         addLabelledField(panel, c, 2, 2, "Author:", authorField);
 
+        JLabel searchLabel = new JLabel("Search:");
+        searchLabel.setFont(Theme.FONT);
+        searchLabel.setForeground(Theme.TEXT);
+        c.gridx = 0;
+        c.gridy = 3;
+        c.gridwidth = 1;
+        c.fill = GridBagConstraints.NONE;
+        c.anchor = GridBagConstraints.WEST;
+        panel.add(searchLabel, c);
+        c.gridx = 1;
+        c.gridwidth = 3;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(searchField, c);
+        installSearchFilter();
+
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         buttons.setOpaque(false);
         buttons.add(addButton);
@@ -224,8 +239,9 @@ public class LibraryFrame extends JFrame {
         buttons.add(statusButton);
         buttons.add(clearButton);
         c.gridx = 0;
-        c.gridy = 3;
+        c.gridy = 4;
         c.gridwidth = 4;
+        c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.CENTER;
         panel.add(buttons, c);
         return panel;
@@ -256,22 +272,9 @@ public class LibraryFrame extends JFrame {
     }
 
     /**
-     * Creates the centre panel that swaps between the table and a large
-     * "Library is empty" label.
-     *
-     * @return the panel holding both card views
+     * Refreshes the filtered table whenever the search text changes.
      */
-    private JPanel buildTablePanel() {
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.getViewport().setBackground(Color.WHITE);
-        emptyLabel.setFont(Theme.EMPTY_FONT);
-        emptyLabel.setForeground(Theme.MUTED);
-        tablePanel.setBackground(Theme.BACKGROUND);
-        tablePanel.add(scrollPane, "table");
-        tablePanel.add(emptyLabel, "empty");
-
-        searchField.setFont(Theme.FONT);
-        searchField.setPreferredSize(new Dimension(220, 30));
+    private void installSearchFilter() {
         searchField.setToolTipText("Filter by ID, title or author");
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             /**
@@ -304,20 +307,23 @@ public class LibraryFrame extends JFrame {
                 updateTable();
             }
         });
+    }
 
-        JLabel searchLabel = new JLabel("Search:");
-        searchLabel.setFont(Theme.FONT);
-        searchLabel.setForeground(Theme.TEXT);
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, Theme.PAD, 10));
-        searchPanel.setBackground(Theme.BACKGROUND);
-        searchPanel.add(searchLabel);
-        searchPanel.add(searchField);
-
-        JPanel tableArea = new JPanel(new BorderLayout());
-        tableArea.setBackground(Theme.BACKGROUND);
-        tableArea.add(searchPanel, BorderLayout.NORTH);
-        tableArea.add(tablePanel, BorderLayout.CENTER);
-        return tableArea;
+    /**
+     * Creates the centre panel that swaps between the table and a large
+     * "Library is empty" label.
+     *
+     * @return the panel holding both card views
+     */
+    private JPanel buildTablePanel() {
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.getViewport().setBackground(Color.WHITE);
+        emptyLabel.setFont(Theme.EMPTY_FONT);
+        emptyLabel.setForeground(Theme.MUTED);
+        tablePanel.setBackground(Theme.BACKGROUND);
+        tablePanel.add(scrollPane, "table");
+        tablePanel.add(emptyLabel, "empty");
+        return tablePanel;
     }
 
     /**
@@ -330,14 +336,22 @@ public class LibraryFrame extends JFrame {
         table.setBackground(Color.WHITE);
         table.setForeground(Theme.TEXT);
         table.setGridColor(new Color(225, 230, 235));
-        table.setSelectionBackground(new Color(205, 222, 245));
-        table.setSelectionForeground(Theme.TEXT);
+        table.setSelectionBackground(Theme.SELECTED_ROW);
+        table.setSelectionForeground(Color.WHITE);
         table.setDefaultRenderer(Object.class, new StatusCellRenderer());
 
-        table.getTableHeader().setFont(Theme.FONT.deriveFont(Font.BOLD));
-        table.getTableHeader().setBackground(Theme.TABLE_HEADER_BG);
-        table.getTableHeader().setForeground(Theme.TEXT);
-        table.getTableHeader().setReorderingAllowed(false);
+        HeaderRenderer headerRenderer = new HeaderRenderer();
+        JTableHeader header = table.getTableHeader();
+        header.setDefaultRenderer(headerRenderer);
+        header.setFont(Theme.FONT.deriveFont(Font.BOLD));
+        header.setBackground(Theme.TABLE_HEADER_BG);
+        header.setForeground(Color.WHITE);
+        header.setOpaque(true);
+        header.setReorderingAllowed(false);
+        header.setPreferredSize(new Dimension(0, 30));
+        for (int column = 0; column < table.getColumnCount(); column++) {
+            table.getColumnModel().getColumn(column).setHeaderRenderer(headerRenderer);
+        }
         table.getColumnModel().getColumn(0).setPreferredWidth(100);
         table.getColumnModel().getColumn(1).setPreferredWidth(240);
         table.getColumnModel().getColumn(2).setPreferredWidth(190);
@@ -520,21 +534,19 @@ public class LibraryFrame extends JFrame {
      */
     private void updateButtonStates() {
         boolean hasSelection = table.getSelectedRow() >= 0;
-        setActionEnabled(updateButton, hasSelection, Theme.NEUTRAL_BUTTON);
-        setActionEnabled(deleteButton, hasSelection, Theme.DELETE);
-        setActionEnabled(statusButton, hasSelection, Theme.NEUTRAL_BUTTON);
+        setActionEnabled(updateButton, hasSelection);
+        setActionEnabled(deleteButton, hasSelection);
+        setActionEnabled(statusButton, hasSelection);
     }
 
     /**
-     * Sets a button's enabled state and its normal background colour.
+     * Sets whether a row-dependent themed button can be clicked.
      *
      * @param button  the button to update
      * @param enabled whether the button can be clicked
-     * @param base    the colour restored when the button is enabled
      */
-    private void setActionEnabled(JButton button, boolean enabled, Color base) {
+    private void setActionEnabled(ThemedButton button, boolean enabled) {
         button.setEnabled(enabled);
-        button.setBackground(enabled ? base : Theme.DISABLED_BUTTON);
     }
 
     /**
@@ -690,53 +702,235 @@ public class LibraryFrame extends JFrame {
     }
 
     /**
-     * Stripes alternate rows and colour-codes the Status column.
+     * Paints the table header with the dark palette colour and white bold text,
+     * because the Windows look and feel ignores header colours.
+     *
+     * @author Syeda Momina Sherazi (534663), Muqaddus Habib (534742)
+     */
+    private static final class HeaderRenderer extends DefaultTableCellRenderer {
+
+        /**
+         * Builds an opaque, centred white-on-dark header renderer.
+         */
+        HeaderRenderer() {
+            setOpaque(true);
+            setHorizontalAlignment(SwingConstants.CENTER);
+            setFont(Theme.FONT.deriveFont(Font.BOLD));
+            setBackground(Theme.TABLE_HEADER_BG);
+            setForeground(Color.WHITE);
+            setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
+        }
+
+        /**
+         * Applies the header colours every time the column is painted.
+         *
+         * @param table      the table that owns the header
+         * @param value      the column name
+         * @param isSelected whether the column is selected
+         * @param hasFocus   whether the header has focus
+         * @param row        the header row index
+         * @param column     the column index
+         * @return the configured header renderer component
+         */
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus,
+                                                       int row, int column) {
+            JLabel cell = (JLabel) super.getTableCellRendererComponent(
+                    table, value, isSelected, hasFocus, row, column);
+            cell.setOpaque(true);
+            cell.setBackground(Theme.TABLE_HEADER_BG);
+            cell.setForeground(Color.WHITE);
+            cell.setFont(Theme.FONT.deriveFont(Font.BOLD));
+            cell.setHorizontalAlignment(SwingConstants.CENTER);
+            return cell;
+        }
+    }
+
+    /**
+     * Text field that paints its own light background and border, so the
+     * colours are not replaced by the system look and feel.
+     *
+     * @author Syeda Momina Sherazi (534663), Muqaddus Habib (534742)
+     */
+    private static final class ThemedTextField extends JTextField {
+
+        /**
+         * Creates a self-painting text field.
+         *
+         * @param columns the number of columns used for its preferred width
+         */
+        ThemedTextField(int columns) {
+            super(columns);
+            setFont(Theme.FONT);
+            setForeground(Theme.TEXT);
+            setCaretColor(Theme.TEXT);
+            setOpaque(false);
+            setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+        }
+
+        /**
+         * Paints a white rounded field with a thin grey border.
+         *
+         * @param g the graphics context
+         */
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D painter = (Graphics2D) g.create();
+            painter.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            painter.setColor(Color.WHITE);
+            painter.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+            painter.setColor(Theme.FIELD_BORDER);
+            painter.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+            painter.dispose();
+            super.paintComponent(g);
+        }
+    }
+
+    /**
+     * Renderer that keeps combo-box items opaque with readable foreground and
+     * selection colours.
+     *
+     * @author Syeda Momina Sherazi (534663), Muqaddus Habib (534742)
+     */
+    private static final class ComboRenderer extends DefaultListCellRenderer {
+
+        /**
+         * Builds an opaque combo-box renderer.
+         */
+        ComboRenderer() {
+            setOpaque(true);
+        }
+
+        /**
+         * Applies the palette colours to the selected or unselected item.
+         *
+         * @param list         the combo-box list
+         * @param value        the item value
+         * @param index        the item index, or -1 for the closed combo box
+         * @param isSelected   whether the item is selected
+         * @param cellHasFocus whether the cell has focus
+         * @return the configured renderer component
+         */
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                      boolean isSelected, boolean cellHasFocus) {
+            JLabel cell = (JLabel) super.getListCellRendererComponent(
+                    list, value, index, isSelected, cellHasFocus);
+            boolean highlighted = isSelected && index >= 0;
+            cell.setOpaque(true);
+            cell.setBackground(highlighted ? Theme.SELECTED_ROW : Color.WHITE);
+            cell.setForeground(highlighted ? Color.WHITE : Theme.TEXT);
+            cell.setFont(Theme.FONT);
+            return cell;
+        }
+    }
+
+    /**
+     * Combo box that paints its own field background and uses the opaque
+     * palette renderer, so its colours survive the system look and feel.
+     *
+     * @param <E> the type of item shown in the combo box
+     * @author Syeda Momina Sherazi (534663), Muqaddus Habib (534742)
+     */
+    private static final class ThemedComboBox<E> extends JComboBox<E> {
+
+        /**
+         * Creates a self-painting combo box for the supplied items.
+         *
+         * @param items the items shown in the drop-down
+         */
+        ThemedComboBox(E[] items) {
+            super(items);
+            setFont(Theme.FONT);
+            setForeground(Theme.TEXT);
+            setBackground(Color.WHITE);
+            setOpaque(false);
+            setBorder(BorderFactory.createLineBorder(Theme.FIELD_BORDER));
+            setRenderer(new ComboRenderer());
+        }
+
+        /**
+         * Paints a white rounded field behind the combo-box arrow and value.
+         *
+         * @param g the graphics context
+         */
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D painter = (Graphics2D) g.create();
+            painter.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            painter.setColor(Color.WHITE);
+            painter.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+            painter.setColor(Theme.FIELD_BORDER);
+            painter.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+            painter.dispose();
+            super.paintComponent(g);
+        }
+    }
+
+    /**
+     * Stripes alternate rows and colour-codes the Status column with an opaque
+     * custom renderer, so the colours survive the system look and feel.
      *
      * @author Syeda Momina Sherazi (534663), Muqaddus Habib (534742)
      */
     private static final class StatusCellRenderer extends DefaultTableCellRenderer {
 
         /**
-         * Builds a cell renderer with row stripes and status colours.
+         * Builds an opaque renderer with row stripes and status colours.
+         */
+        StatusCellRenderer() {
+            setOpaque(true);
+            setFont(Theme.FONT);
+        }
+
+        /**
+         * Paints each cell with its row or status colour.
          *
-         * @param table    the table being rendered
-         * @param value    the value of the current cell
+         * @param table      the table being rendered
+         * @param value      the value of the current cell
          * @param isSelected whether the row is selected
-         * @param hasFocus  whether the cell has focus
-         * @param row      the row index
-         * @param column   the column index
+         * @param hasFocus   whether the cell has focus
+         * @param row        the row index
+         * @param column     the column index
          * @return the configured renderer component
          */
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus,
                                                        int row, int column) {
-            Component component = super.getTableCellRendererComponent(
+            JComponent component = (JComponent) super.getTableCellRendererComponent(
                     table, value, isSelected, hasFocus, row, column);
-            if (!isSelected) {
-                Color background = (row % 2 == 0) ? Color.WHITE : Theme.ROW_ALT;
-                Color foreground = Theme.TEXT;
-                if (column == STATUS_COLUMN && value instanceof BookStatus) {
-                    switch ((BookStatus) value) {
-                        case AVAILABLE:
-                            background = Theme.AVAILABLE_BG;
-                            foreground = Theme.AVAILABLE_FG;
-                            break;
-                        case ISSUED:
-                            background = Theme.ISSUED_BG;
-                            foreground = Theme.ISSUED_FG;
-                            break;
-                        case RESERVED:
-                            background = Theme.RESERVED_BG;
-                            foreground = Theme.RESERVED_FG;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                component.setBackground(background);
-                component.setForeground(foreground);
+            component.setOpaque(true);
+            if (isSelected) {
+                component.setBackground(Theme.SELECTED_ROW);
+                component.setForeground(Color.WHITE);
+                return component;
             }
+            Color background = (row % 2 == 0) ? Color.WHITE : Theme.ROW_ALT;
+            Color foreground = Theme.TEXT;
+            if (column == STATUS_COLUMN && value instanceof BookStatus) {
+                switch ((BookStatus) value) {
+                    case AVAILABLE:
+                        background = Theme.AVAILABLE_BG;
+                        foreground = Theme.AVAILABLE_FG;
+                        break;
+                    case ISSUED:
+                        background = Theme.ISSUED_BG;
+                        foreground = Theme.ISSUED_FG;
+                        break;
+                    case RESERVED:
+                        background = Theme.RESERVED_BG;
+                        foreground = Theme.RESERVED_FG;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            component.setBackground(background);
+            component.setForeground(foreground);
             return component;
         }
     }
@@ -792,8 +986,12 @@ public class LibraryFrame extends JFrame {
         public static final Color SUCCESS = new Color(25, 135, 84);
         /** Red colour for error status-bar messages. */
         public static final Color ERROR = new Color(200, 35, 51);
-        /** Background of the table header. */
-        public static final Color TABLE_HEADER_BG = new Color(222, 230, 240);
+        /** Thin border around text fields and the status combo box. */
+        public static final Color FIELD_BORDER = new Color(190, 198, 208);
+        /** Background of the selected table row. */
+        public static final Color SELECTED_ROW = new Color(41, 98, 173);
+        /** Dark background of the table header. */
+        public static final Color TABLE_HEADER_BG = new Color(33, 45, 61);
         /** Background of every second table row. */
         public static final Color ROW_ALT = new Color(236, 241, 247);
         /** Background of AVAILABLE status cells. */
