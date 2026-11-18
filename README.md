@@ -27,7 +27,7 @@ src/
   model/BookStatus.java         # AVAILABLE, ISSUED, RESERVED
   service/LibraryService.java   # in-memory business logic
   service/LibraryException.java # checked validation / not-found error
-  ui/LibraryFrame.java          # Swing GUI + Theme palette/nested renderer
+  ui/LibraryFrame.java          # Swing GUI, Theme palette and nested renderers
   test/LibraryServiceTest.java  # plain-Java test runner (8 cases)
 docs/                           # generated Javadoc and evidence files
 run.sh / run.bat                # compile and launch
@@ -46,12 +46,18 @@ package so the application can be launched with `java -cp out Main`.
   members and IDs.
 - GridBagLayout form with equal-width fields, 12px padding and a 900x600 minimum
   window size; the window resizes cleanly.
-- Themed buttons: consistent font/size, hover colours, tooltips and mnemonics
-  (Alt+A Add, Alt+U Update, Alt+D Delete). Delete is red, Add is blue.
-- Table with 28px rows, bold coloured header, alternating rows and colour-coded
-  statuses (green AVAILABLE, orange/red ISSUED, amber RESERVED).
-- Live search above the table filters by ID, title or author; the empty message
-  becomes "No matching books" when a filter hides everything.
+- One reusable `ThemedButton` paints its own 110x34 rounded background in
+  `paintComponent`, so the Windows look and feel cannot hide it. Add is blue,
+  Update/Set Status teal, Delete red and Clear neutral, with darker hover and
+  pressed fills and a visible light-grey disabled shape. All five buttons are
+  centred with 10px gaps and keep tooltips and mnemonics (Alt+A/U/D/S/C).
+- Table with 28px rows and custom opaque renderers: a dark header with white
+  bold text, alternating rows and colour-coded statuses (green AVAILABLE,
+  orange/red ISSUED, amber RESERVED). Text fields and the combo box also paint
+  their own light backgrounds.
+- Live search is part of the centred form grid, aligned with the Book ID label;
+  its field spans the form-field columns. It filters by ID, title or author, and
+  the empty message becomes "No matching books" when a filter hides everything.
 - Update / Delete / Set Status stay disabled until a table row is selected;
   selecting a row fills the form, and Clear also clears the selection.
 - Slim bottom status bar shows the last message in green (success) or red

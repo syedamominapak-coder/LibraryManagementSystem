@@ -4,6 +4,8 @@ On branch main
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
+	modified:   README.md
+	modified:   docs/DEMO.md
 	modified:   docs/javadoc/Main.html
 	modified:   docs/javadoc/allclasses-index.html
 	modified:   docs/javadoc/allpackages-index.html
@@ -14,6 +16,7 @@ Changes not staged for commit:
 	modified:   docs/javadoc/help-doc.html
 	modified:   docs/javadoc/index-all.html
 	modified:   docs/javadoc/index.html
+	modified:   docs/javadoc/member-search-index.js
 	modified:   docs/javadoc/model/Book.html
 	modified:   docs/javadoc/model/BookStatus.html
 	modified:   docs/javadoc/model/package-summary.html
@@ -35,6 +38,5 @@ Changes not staged for commit:
 	modified:   docs/javadoc/ui/LibraryFrame.html
 	modified:   docs/javadoc/ui/package-summary.html
 	modified:   docs/javadoc/ui/package-tree.html
-	modified:   src/ui/LibraryFrame.java
 
 no changes added to commit (use "git add" and/or "git commit -a")

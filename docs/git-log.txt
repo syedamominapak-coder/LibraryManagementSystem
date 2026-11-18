@@ -1,9 +1,15 @@
 ﻿Group Members: Syeda Momina Sherazi (534663) | Muqaddus Habib (534742)
 # git log --oneline --graph --stat
-* a09c103 docs: refresh UI docs, Javadoc HTML and evidence for polished GUI
+* 2c1098c fix: align search row and style table header
+|  src/ui/LibraryFrame.java | 366 ++++++++++++++++++++++++++++++++++-----------
+|  1 file changed, 282 insertions(+), 84 deletions(-)
+* 4a2a3eb fix: paint button backgrounds with themed button class
+|  src/ui/LibraryFrame.java | 245 +++++++++++++++++++++++++++++++++------------
+|  1 file changed, 182 insertions(+), 63 deletions(-)
+* 4952b79 docs: refresh UI docs, Javadoc HTML and evidence for polished GUI
 |  README.md                                  |  20 +-
 |  docs/DEMO.md                               |  54 ++-
-|  docs/git-log.txt                           | 103 +++++
+|  docs/git-log.txt                           | 144 ++++++
 |  docs/git-status.txt                        |  45 +-
 |  docs/javadoc/Main.html                     |   7 +-
 |  docs/javadoc/allclasses-index.html         |  24 +-
@@ -39,8 +45,8 @@
 |  docs/javadoc/ui/package-summary.html       |   9 +-
 |  docs/javadoc/ui/package-tree.html          |   3 +-
 |  src/Main.java                              |   5 +-
-|  src/ui/LibraryFrame.java                   |   6 +-
-|  39 files changed, 1119 insertions(+), 90 deletions(-)
+|  src/ui/LibraryFrame.java                   |  12 +-
+|  39 files changed, 1159 insertions(+), 97 deletions(-)
 * 9a1e431 feat: add live search, button states and colour status bar
 |  src/ui/LibraryFrame.java | 235 +++++++++++++++++++++++++++++++++++++++------
 |  1 file changed, 207 insertions(+), 28 deletions(-)
