@@ -1,0 +1,42 @@
+﻿Group Members: Syeda Momina Sherazi (534663) | Muqaddus Habib (534742)
+# git log --oneline --graph --stat
+* 2b488ea fix: clarify duplicate-ID validation message
+|  src/service/LibraryService.java | 2 +-
+|  1 file changed, 1 insertion(+), 1 deletion(-)
+* 8930a21 docs: add full Javadoc comments and author tags to all sources
+|  src/Main.java                     | 18 +++++++-
+|  src/app/AppInfo.java              | 11 ++++-
+|  src/model/Book.java               | 48 +++++++++++++++++++++-
+|  src/model/BookStatus.java         | 12 +++++-
+|  src/service/LibraryException.java | 11 ++++-
+|  src/service/LibraryService.java   | 56 ++++++++++++++++++++++++-
+|  src/test/LibraryServiceTest.java  | 64 ++++++++++++++++++++++++++++-
+|  src/ui/LibraryFrame.java          | 82 ++++++++++++++++++++++++++++++++++++-
+|  8 files changed, 293 insertions(+), 9 deletions(-)
+* 18b4bd9 test: add 8-case LibraryService runner and save genuine results
+|  docs/test-results.txt            |  13 ++++
+|  src/test/LibraryServiceTest.java | 140 +++++++++++++++++++++++++++++++++++++
+|  2 files changed, 153 insertions(+)
+* 36b02a2 feat: wire Swing GUI to LibraryService and add Main entry point
+|  src/Main.java            |  18 ++++
+|  src/ui/LibraryFrame.java | 221 +++++++++++++++++++++++++++++++++++++++++++++
+|  2 files changed, 239 insertions(+)
+* 6ec13b5 feat: set book status to available, issued or reserved
+|  src/service/LibraryService.java | 12 ++++++++++++
+|  1 file changed, 12 insertions(+)
+* cfed194 feat: view all, update and delete with not-found handling
+|  src/service/LibraryService.java | 33 +++++++++++++++++++++++++++++++++
+|  1 file changed, 33 insertions(+)
+* 507d0fc feat: add book with empty-field and duplicate-ID validation
+|  src/service/LibraryException.java |  9 +++++++++
+|  src/service/LibraryService.java   | 39 +++++++++++++++++++++++++++++++++++++
+|  2 files changed, 48 insertions(+)
+* 4a35b44 feat: add Book model, BookStatus enum and AppInfo constant
+|  src/app/AppInfo.java      | 12 ++++++++++++
+|  src/model/Book.java       | 45 +++++++++++++++++++++++++++++++++++++++++++++
+|  src/model/BookStatus.java |  8 ++++++++
+|  3 files changed, 65 insertions(+)
+* d97f69e chore: initialise repository with README and .gitignore
+   .gitignore |  5 +++++
+   README.md  | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   2 files changed, 77 insertions(+)

@@ -1,0 +1,16 @@
+﻿Group Members: Syeda Momina Sherazi (534663) | Muqaddus Habib (534742)
+# git diff captured BEFORE committing the error-message improvement
+warning: in the working copy of 'src/service/LibraryService.java', LF will be replaced by CRLF the next time Git touches it
+diff --git a/src/service/LibraryService.java b/src/service/LibraryService.java
+index ab5f7ad..8ae4463 100644
+--- a/src/service/LibraryService.java
++++ b/src/service/LibraryService.java
+@@ -49,7 +49,7 @@ public class LibraryService {
+             throw new LibraryException("Author must not be empty. Please enter an author.");
+         }
+         if (books.containsKey(cleanId)) {
+-            throw new LibraryException("A book with ID '" + cleanId + "' already exists. Use a unique ID.");
++            throw new LibraryException("A book with ID '" + cleanId + "' already exists. Please use a different, unique ID.");
+         }
+ 
+         books.put(cleanId, new Book(cleanId, cleanTitle, cleanAuthor));
