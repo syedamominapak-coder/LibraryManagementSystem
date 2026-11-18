@@ -2,9 +2,25 @@ import app.AppInfo;
 import java.awt.EventQueue;
 import ui.LibraryFrame;
 
-/** Entry point that launches the Swing GUI on the Event Dispatch Thread. */
+/**
+ * Application entry point that prints the group members and launches the Swing
+ * window on the Event Dispatch Thread.
+ *
+ * @author Syeda Momina Sherazi (534663), Muqaddus Habib (534742)
+ */
 public class Main {
 
+    /**
+     * Prevents instantiation of this entry-point class.
+     */
+    private Main() {
+    }
+
+    /**
+     * Starts the application.
+     *
+     * @param args command-line arguments; this application does not use them
+     */
     public static void main(String[] args) {
         System.out.println("Library Book Management System");
         System.out.println("Group Members: " + AppInfo.MEMBERS);

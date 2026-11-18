@@ -27,26 +27,50 @@ import model.BookStatus;
 import service.LibraryException;
 import service.LibraryService;
 
-/** Swing window for adding, viewing, updating, deleting and issuing books. */
+/**
+ * Swing window for adding, viewing, updating, deleting and issuing books. The
+ * window title and footer both show the names and IDs of the group members.
+ *
+ * @author Syeda Momina Sherazi (534663), Muqaddus Habib (534742)
+ */
 public class LibraryFrame extends JFrame {
 
+    /** In-memory business logic used by all buttons. */
     private final LibraryService service = new LibraryService();
+    /** Input field for the unique book ID. */
     private final JTextField idField = new JTextField(12);
+    /** Input field for the book title. */
     private final JTextField titleField = new JTextField(20);
+    /** Input field for the book author. */
     private final JTextField authorField = new JTextField(20);
+    /** Combo box for choosing AVAILABLE, ISSUED or RESERVED. */
     private final JComboBox<BookStatus> statusCombo =
             new JComboBox<>(BookStatus.values());
+    /** Read-only data model behind the book table. */
     private final DefaultTableModel tableModel = new DefaultTableModel(
             new String[]{"ID", "Title", "Author", "Status"}, 0) {
+        /**
+         * Keeps the table read-only so changes go through the buttons.
+         *
+         * @param row    the row index
+         * @param column the column index
+         * @return always false, because cells must not be edited directly
+         */
         @Override
         public boolean isCellEditable(int row, int column) {
             return false;
         }
     };
+    /** Table showing every book in the library. */
     private final JTable table = new JTable(tableModel);
+    /** Card panel that swaps the table with the empty-library label. */
     private final JPanel tablePanel = new JPanel(new CardLayout());
+    /** Area used for success messages and friendly errors. */
     private final JTextArea messageArea = new JTextArea(3, 40);
 
+    /**
+     * Builds the window, wires the buttons to the service and shows the table.
+     */
     public LibraryFrame() {
         setTitle("Library Book Management System - " + AppInfo.MEMBERS);
         setSize(950, 600);
@@ -63,6 +87,12 @@ public class LibraryFrame extends JFrame {
         showMessage("Library is empty. Add your first book using the form above.");
     }
 
+    /**
+     * Creates the form with input fields, the status combo box and the
+     * Add, Update, Delete, Set Status and Clear buttons.
+     *
+     * @return the configured input panel
+     */
     private JPanel buildInputPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Book details"));
@@ -107,6 +137,12 @@ public class LibraryFrame extends JFrame {
         return panel;
     }
 
+    /**
+     * Creates the centre panel that swaps between the table and a large
+     * "Library is empty" label.
+     *
+     * @return the panel holding both card views
+     */
     private JPanel buildTablePanel() {
         JScrollPane scrollPane = new JScrollPane(table);
         JLabel emptyLabel = new JLabel("Library is empty", SwingConstants.CENTER);
@@ -116,6 +152,11 @@ public class LibraryFrame extends JFrame {
         return tablePanel;
     }
 
+    /**
+     * Creates the message area and the footer with the member names and IDs.
+     *
+     * @return the configured bottom panel
+     */
     private JPanel buildBottomPanel() {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         messageArea.setEditable(false);
@@ -129,12 +170,22 @@ public class LibraryFrame extends JFrame {
         return panel;
     }
 
+    /**
+     * Creates a button with an action listener.
+     *
+     * @param text     the label printed on the button
+     * @param listener the action performed when the button is clicked
+     * @return the new button
+     */
     private JButton makeButton(String text, java.awt.event.ActionListener listener) {
         JButton button = new JButton(text);
         button.addActionListener(listener);
         return button;
     }
 
+    /**
+     * Adds the book typed into the form and refreshes the table.
+     */
     private void addBook() {
         try {
             service.addBook(idField.getText(), titleField.getText(), authorField.getText());
@@ -145,6 +196,9 @@ public class LibraryFrame extends JFrame {
         }
     }
 
+    /**
+     * Updates the book whose ID is typed into the form.
+     */
     private void updateBook() {
         try {
             service.updateBook(idField.getText(), titleField.getText(), authorField.getText());
@@ -155,6 +209,9 @@ public class LibraryFrame extends JFrame {
         }
     }
 
+    /**
+     * Deletes the book whose ID is typed into the form.
+     */
     private void deleteBook() {
         try {
             service.deleteBook(idField.getText());
@@ -166,6 +223,9 @@ public class LibraryFrame extends JFrame {
         }
     }
 
+    /**
+     * Applies the status chosen in the combo box to the current book.
+     */
     private void setStatus() {
         try {
             BookStatus status = (BookStatus) statusCombo.getSelectedItem();
@@ -177,6 +237,9 @@ public class LibraryFrame extends JFrame {
         }
     }
 
+    /**
+     * Empties the input fields and resets the status combo box.
+     */
     private void clearForm() {
         idField.setText("");
         titleField.setText("");
@@ -186,6 +249,9 @@ public class LibraryFrame extends JFrame {
         showMessage("Form cleared.");
     }
 
+    /**
+     * Copies the selected table row into the form for editing or status changes.
+     */
     private void loadSelectedBook() {
         int row = table.getSelectedRow();
         if (row < 0) {
@@ -197,6 +263,9 @@ public class LibraryFrame extends JFrame {
         statusCombo.setSelectedItem(table.getValueAt(row, 3));
     }
 
+    /**
+     * Rebuilds the table rows and shows the empty-library message when needed.
+     */
     private void updateTable() {
         tableModel.setRowCount(0);
         List<Book> books = service.getAll();
@@ -209,10 +278,21 @@ public class LibraryFrame extends JFrame {
         cards.show(tablePanel, books.isEmpty() ? "empty" : "table");
     }
 
+    /**
+     * Writes a normal message to the message area.
+     *
+     * @param text the message to display
+     */
     private void showMessage(String text) {
         messageArea.setText(text);
     }
 
+    /**
+     * Reports a service error in the message area and in an error dialog, never
+     * as a stack trace.
+     *
+     * @param e the exception raised by the service
+     */
     private void showError(LibraryException e) {
         messageArea.setText("Error: " + e.getMessage());
         JOptionPane.showMessageDialog(this, e.getMessage(), "Library Error",
