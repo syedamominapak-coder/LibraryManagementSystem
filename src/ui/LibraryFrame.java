@@ -6,11 +6,17 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -22,9 +28,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -77,8 +84,20 @@ public class LibraryFrame extends JFrame {
     private final JPanel tablePanel = new JPanel(new CardLayout());
     /** Centred message shown when the table has no rows. */
     private final JLabel emptyLabel = new JLabel("Library is empty", SwingConstants.CENTER);
-    /** Area used for success messages and friendly errors. */
-    private final JTextArea messageArea = new JTextArea(3, 40);
+    /** Text field that filters the table as the user types. */
+    private final JTextField searchField = new JTextField(18);
+    /** Slim bar showing the last success or error message. */
+    private final JLabel statusBar = new JLabel("Ready");
+    /** Adds a new book. */
+    private final JButton addButton;
+    /** Updates the selected book. */
+    private final JButton updateButton;
+    /** Deletes the selected book. */
+    private final JButton deleteButton;
+    /** Changes the status of the selected book. */
+    private final JButton statusButton;
+    /** Clears the form and the table selection. */
+    private final JButton clearButton;
 
     /**
      * Builds the window, wires the buttons to the service and shows the table.
@@ -91,6 +110,20 @@ public class LibraryFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setBackground(Theme.BACKGROUND);
 
+        addButton = makeButton("Add", event -> addBook(), Theme.ACCENT,
+                Theme.ACCENT_HOVER, KeyEvent.VK_A, "Add the book in the form (Alt+A)");
+        updateButton = makeButton("Update", event -> updateBook(), Theme.NEUTRAL_BUTTON,
+                Theme.NEUTRAL_BUTTON_HOVER, KeyEvent.VK_U, "Update the selected book (Alt+U)");
+        deleteButton = makeButton("Delete", event -> deleteBook(), Theme.DELETE,
+                Theme.DELETE_HOVER, KeyEvent.VK_D, "Delete the selected book (Alt+D)");
+        statusButton = makeButton("Set Status", event -> setStatus(), Theme.NEUTRAL_BUTTON,
+                Theme.NEUTRAL_BUTTON_HOVER, KeyEvent.VK_S, "Set the selected book's status (Alt+S)");
+        clearButton = makeButton("Clear", event -> clearForm(), Theme.NEUTRAL_BUTTON,
+                Theme.NEUTRAL_BUTTON_HOVER, KeyEvent.VK_C, "Clear the form (Alt+C)");
+        updateButton.setEnabled(false);
+        deleteButton.setEnabled(false);
+        statusButton.setEnabled(false);
+
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(Theme.BACKGROUND);
         topPanel.add(buildHeaderPanel(), BorderLayout.NORTH);
@@ -101,7 +134,10 @@ public class LibraryFrame extends JFrame {
 
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         styleTable();
-        table.getSelectionModel().addListSelectionListener(event -> loadSelectedBook());
+        table.getSelectionModel().addListSelectionListener(event -> {
+            loadSelectedBook();
+            updateButtonStates();
+        });
         updateTable();
         showMessage("Library is empty. Add your first book using the form above.");
     }
@@ -172,11 +208,11 @@ public class LibraryFrame extends JFrame {
 
         JPanel buttons = new JPanel();
         buttons.setOpaque(false);
-        buttons.add(makeButton("Add", event -> addBook()));
-        buttons.add(makeButton("Update", event -> updateBook()));
-        buttons.add(makeButton("Delete", event -> deleteBook()));
-        buttons.add(makeButton("Set Status", event -> setStatus()));
-        buttons.add(makeButton("Clear", event -> clearForm()));
+        buttons.add(addButton);
+        buttons.add(updateButton);
+        buttons.add(deleteButton);
+        buttons.add(statusButton);
+        buttons.add(clearButton);
         c.gridx = 0;
         c.gridy = 3;
         c.gridwidth = 4;
@@ -223,7 +259,55 @@ public class LibraryFrame extends JFrame {
         tablePanel.setBackground(Theme.BACKGROUND);
         tablePanel.add(scrollPane, "table");
         tablePanel.add(emptyLabel, "empty");
-        return tablePanel;
+
+        searchField.setFont(Theme.FONT);
+        searchField.setPreferredSize(new Dimension(220, 30));
+        searchField.setToolTipText("Filter by ID, title or author");
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            /**
+             * Refreshes the table after text is inserted.
+             *
+             * @param event the document event
+             */
+            @Override
+            public void insertUpdate(DocumentEvent event) {
+                updateTable();
+            }
+
+            /**
+             * Refreshes the table after text is removed.
+             *
+             * @param event the document event
+             */
+            @Override
+            public void removeUpdate(DocumentEvent event) {
+                updateTable();
+            }
+
+            /**
+             * Refreshes the table when the document changes style.
+             *
+             * @param event the document event
+             */
+            @Override
+            public void changedUpdate(DocumentEvent event) {
+                updateTable();
+            }
+        });
+
+        JLabel searchLabel = new JLabel("Search:");
+        searchLabel.setFont(Theme.FONT);
+        searchLabel.setForeground(Theme.TEXT);
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, Theme.PAD, 6));
+        searchPanel.setBackground(Theme.BACKGROUND);
+        searchPanel.add(searchLabel);
+        searchPanel.add(searchField);
+
+        JPanel tableArea = new JPanel(new BorderLayout());
+        tableArea.setBackground(Theme.BACKGROUND);
+        tableArea.add(searchPanel, BorderLayout.NORTH);
+        tableArea.add(tablePanel, BorderLayout.CENTER);
+        return tableArea;
     }
 
     /**
@@ -251,7 +335,7 @@ public class LibraryFrame extends JFrame {
     }
 
     /**
-     * Creates the message area and the footer with the member names and IDs.
+     * Creates the slim status bar and the footer with the member names and IDs.
      *
      * @return the configured bottom panel
      */
@@ -260,12 +344,15 @@ public class LibraryFrame extends JFrame {
         panel.setBackground(Theme.BACKGROUND);
         panel.setBorder(BorderFactory.createEmptyBorder(
                 0, Theme.PAD, Theme.PAD, Theme.PAD));
-        messageArea.setEditable(false);
-        messageArea.setFont(Theme.FONT);
-        messageArea.setLineWrap(true);
-        messageArea.setWrapStyleWord(true);
-        messageArea.setBorder(BorderFactory.createTitledBorder("Messages"));
-        panel.add(new JScrollPane(messageArea), BorderLayout.CENTER);
+
+        statusBar.setFont(Theme.STATUS_FONT);
+        statusBar.setForeground(Theme.SUCCESS);
+        statusBar.setOpaque(true);
+        statusBar.setBackground(Color.WHITE);
+        statusBar.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(220, 225, 230)),
+                BorderFactory.createEmptyBorder(8, 10, 8, 10)));
+        panel.add(statusBar, BorderLayout.CENTER);
 
         JLabel footer = new JLabel("Group Members: " + AppInfo.MEMBERS, SwingConstants.CENTER);
         footer.setFont(Theme.FOOTER_FONT);
@@ -275,15 +362,55 @@ public class LibraryFrame extends JFrame {
     }
 
     /**
-     * Creates a button with an action listener.
+     * Creates a styled button with a mnemonic, tooltip and hover colour.
      *
      * @param text     the label printed on the button
      * @param listener the action performed when the button is clicked
+     * @param base     the normal background colour
+     * @param hover    the background colour while the mouse is over the button
+     * @param mnemonic the keyboard mnemonic key code
+     * @param tooltip  the tooltip shown on hover
      * @return the new button
      */
-    private JButton makeButton(String text, java.awt.event.ActionListener listener) {
+    private JButton makeButton(String text, ActionListener listener, Color base,
+                               Color hover, int mnemonic, String tooltip) {
         JButton button = new JButton(text);
+        button.setFont(Theme.FONT);
+        button.setPreferredSize(new Dimension(115, 32));
+        button.setFocusPainted(false);
+        button.setOpaque(true);
+        button.setContentAreaFilled(false);
+        button.setBackground(base);
+        button.setForeground(Color.WHITE);
+        button.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+        button.setMnemonic(mnemonic);
+        button.setToolTipText(tooltip);
         button.addActionListener(listener);
+        button.addMouseListener(new MouseAdapter() {
+            /**
+             * Applies the hover colour when the mouse enters the button.
+             *
+             * @param event the mouse event
+             */
+            @Override
+            public void mouseEntered(MouseEvent event) {
+                if (button.isEnabled()) {
+                    button.setBackground(hover);
+                }
+            }
+
+            /**
+             * Restores the base colour when the mouse leaves the button.
+             *
+             * @param event the mouse event
+             */
+            @Override
+            public void mouseExited(MouseEvent event) {
+                if (button.isEnabled()) {
+                    button.setBackground(base);
+                }
+            }
+        });
         return button;
     }
 
@@ -350,6 +477,7 @@ public class LibraryFrame extends JFrame {
         authorField.setText("");
         statusCombo.setSelectedItem(BookStatus.AVAILABLE);
         table.clearSelection();
+        updateButtonStates();
         showMessage("Form cleared.");
     }
 
@@ -368,37 +496,88 @@ public class LibraryFrame extends JFrame {
     }
 
     /**
-     * Rebuilds the table rows and shows the empty-library message when needed.
+     * Rebuilds the table from the books that match the current search text and
+     * shows the correct empty message.
      */
     private void updateTable() {
+        String query = searchField.getText() == null
+                ? "" : searchField.getText().trim().toLowerCase();
+        List<Book> visibleBooks = new ArrayList<>();
+        for (Book book : service.getAll()) {
+            if (matchesFilter(book, query)) {
+                visibleBooks.add(book);
+            }
+        }
+
         tableModel.setRowCount(0);
-        List<Book> books = service.getAll();
-        for (Book book : books) {
+        for (Book book : visibleBooks) {
             tableModel.addRow(new Object[]{
                 book.getId(), book.getTitle(), book.getAuthor(), book.getStatus()
             });
         }
+        emptyLabel.setText(query.isEmpty() ? "Library is empty" : "No matching books");
         CardLayout cards = (CardLayout) tablePanel.getLayout();
-        cards.show(tablePanel, books.isEmpty() ? "empty" : "table");
+        cards.show(tablePanel, visibleBooks.isEmpty() ? "empty" : "table");
+        updateButtonStates();
     }
 
     /**
-     * Writes a normal message to the message area.
+     * Checks whether a book matches the search text.
+     *
+     * @param book  the book being tested
+     * @param query the lowercase search text
+     * @return true when the query is empty or matches ID, title or author
+     */
+    private boolean matchesFilter(Book book, String query) {
+        if (query.isEmpty()) {
+            return true;
+        }
+        return book.getId().toLowerCase().contains(query)
+                || book.getTitle().toLowerCase().contains(query)
+                || book.getAuthor().toLowerCase().contains(query);
+    }
+
+    /**
+     * Enables the row-dependent buttons only when a table row is selected.
+     */
+    private void updateButtonStates() {
+        boolean hasSelection = table.getSelectedRow() >= 0;
+        setActionEnabled(updateButton, hasSelection, Theme.NEUTRAL_BUTTON);
+        setActionEnabled(deleteButton, hasSelection, Theme.DELETE);
+        setActionEnabled(statusButton, hasSelection, Theme.NEUTRAL_BUTTON);
+    }
+
+    /**
+     * Sets a button's enabled state and its normal background colour.
+     *
+     * @param button  the button to update
+     * @param enabled whether the button can be clicked
+     * @param base    the colour restored when the button is enabled
+     */
+    private void setActionEnabled(JButton button, boolean enabled, Color base) {
+        button.setEnabled(enabled);
+        button.setBackground(enabled ? base : Theme.DISABLED_BUTTON);
+    }
+
+    /**
+     * Writes a success message in green to the status bar.
      *
      * @param text the message to display
      */
     private void showMessage(String text) {
-        messageArea.setText(text);
+        statusBar.setText(text);
+        statusBar.setForeground(Theme.SUCCESS);
     }
 
     /**
-     * Reports a service error in the message area and in an error dialog, never
-     * as a stack trace.
+     * Reports a service error in red in the status bar and in an error dialog,
+     * never as a stack trace.
      *
      * @param e the exception raised by the service
      */
     private void showError(LibraryException e) {
-        messageArea.setText("Error: " + e.getMessage());
+        statusBar.setText("Error: " + e.getMessage());
+        statusBar.setForeground(Theme.ERROR);
         JOptionPane.showMessageDialog(this, e.getMessage(), "Library Error",
                 JOptionPane.ERROR_MESSAGE);
     }
