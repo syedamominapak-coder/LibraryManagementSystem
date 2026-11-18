@@ -8,7 +8,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
+import java.awt.RenderingHints;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -91,15 +94,15 @@ public class LibraryFrame extends JFrame {
     /** Slim bar showing the last success or error message. */
     private final JLabel statusBar = new JLabel("Ready");
     /** Adds a new book. */
-    private final JButton addButton;
+    private final ThemedButton addButton;
     /** Updates the selected book. */
-    private final JButton updateButton;
+    private final ThemedButton updateButton;
     /** Deletes the selected book. */
-    private final JButton deleteButton;
+    private final ThemedButton deleteButton;
     /** Changes the status of the selected book. */
-    private final JButton statusButton;
+    private final ThemedButton statusButton;
     /** Clears the form and the table selection. */
-    private final JButton clearButton;
+    private final ThemedButton clearButton;
 
     /**
      * Builds the window, wires the buttons to the service and shows the table.
@@ -113,15 +116,20 @@ public class LibraryFrame extends JFrame {
         getContentPane().setBackground(Theme.BACKGROUND);
 
         addButton = makeButton("Add", event -> addBook(), Theme.ACCENT,
-                Theme.ACCENT_HOVER, KeyEvent.VK_A, "Add the book in the form (Alt+A)");
-        updateButton = makeButton("Update", event -> updateBook(), Theme.NEUTRAL_BUTTON,
-                Theme.NEUTRAL_BUTTON_HOVER, KeyEvent.VK_U, "Update the selected book (Alt+U)");
+                Theme.ACCENT_HOVER, Theme.ACCENT_PRESSED,
+                KeyEvent.VK_A, "Add the book in the form (Alt+A)");
+        updateButton = makeButton("Update", event -> updateBook(), Theme.TEAL,
+                Theme.TEAL_HOVER, Theme.TEAL_PRESSED,
+                KeyEvent.VK_U, "Update the selected book (Alt+U)");
         deleteButton = makeButton("Delete", event -> deleteBook(), Theme.DELETE,
-                Theme.DELETE_HOVER, KeyEvent.VK_D, "Delete the selected book (Alt+D)");
-        statusButton = makeButton("Set Status", event -> setStatus(), Theme.NEUTRAL_BUTTON,
-                Theme.NEUTRAL_BUTTON_HOVER, KeyEvent.VK_S, "Set the selected book's status (Alt+S)");
+                Theme.DELETE_HOVER, Theme.DELETE_PRESSED,
+                KeyEvent.VK_D, "Delete the selected book (Alt+D)");
+        statusButton = makeButton("Set Status", event -> setStatus(), Theme.TEAL,
+                Theme.TEAL_HOVER, Theme.TEAL_PRESSED,
+                KeyEvent.VK_S, "Set the selected book's status (Alt+S)");
         clearButton = makeButton("Clear", event -> clearForm(), Theme.NEUTRAL_BUTTON,
-                Theme.NEUTRAL_BUTTON_HOVER, KeyEvent.VK_C, "Clear the form (Alt+C)");
+                Theme.NEUTRAL_BUTTON_HOVER, Theme.NEUTRAL_BUTTON_PRESSED,
+                KeyEvent.VK_C, "Clear the form (Alt+C)");
         updateButton.setEnabled(false);
         deleteButton.setEnabled(false);
         statusButton.setEnabled(false);
@@ -208,7 +216,7 @@ public class LibraryFrame extends JFrame {
         addLabelledField(panel, c, 0, 2, "Title:", titleField);
         addLabelledField(panel, c, 2, 2, "Author:", authorField);
 
-        JPanel buttons = new JPanel();
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         buttons.setOpaque(false);
         buttons.add(addButton);
         buttons.add(updateButton);
@@ -218,7 +226,7 @@ public class LibraryFrame extends JFrame {
         c.gridx = 0;
         c.gridy = 3;
         c.gridwidth = 4;
-        c.anchor = GridBagConstraints.EAST;
+        c.anchor = GridBagConstraints.CENTER;
         panel.add(buttons, c);
         return panel;
     }
@@ -364,55 +372,23 @@ public class LibraryFrame extends JFrame {
     }
 
     /**
-     * Creates a styled button with a mnemonic, tooltip and hover colour.
+     * Creates one of the five self-painting action buttons.
      *
      * @param text     the label printed on the button
      * @param listener the action performed when the button is clicked
-     * @param base     the normal background colour
-     * @param hover    the background colour while the mouse is over the button
+     * @param normal   the normal fill colour
+     * @param hover    the fill colour while the mouse is over the button
+     * @param pressed  the fill colour while the button is pressed
      * @param mnemonic the keyboard mnemonic key code
      * @param tooltip  the tooltip shown on hover
-     * @return the new button
+     * @return the new themed button
      */
-    private JButton makeButton(String text, ActionListener listener, Color base,
-                               Color hover, int mnemonic, String tooltip) {
-        JButton button = new JButton(text);
-        button.setFont(Theme.FONT);
-        button.setPreferredSize(new Dimension(115, 32));
-        button.setFocusPainted(false);
-        button.setOpaque(true);
-        button.setContentAreaFilled(false);
-        button.setBackground(base);
-        button.setForeground(Color.WHITE);
-        button.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+    private ThemedButton makeButton(String text, ActionListener listener, Color normal,
+                                    Color hover, Color pressed, int mnemonic, String tooltip) {
+        ThemedButton button = new ThemedButton(text, normal, hover, pressed);
         button.setMnemonic(mnemonic);
         button.setToolTipText(tooltip);
         button.addActionListener(listener);
-        button.addMouseListener(new MouseAdapter() {
-            /**
-             * Applies the hover colour when the mouse enters the button.
-             *
-             * @param event the mouse event
-             */
-            @Override
-            public void mouseEntered(MouseEvent event) {
-                if (button.isEnabled()) {
-                    button.setBackground(hover);
-                }
-            }
-
-            /**
-             * Restores the base colour when the mouse leaves the button.
-             *
-             * @param event the mouse event
-             */
-            @Override
-            public void mouseExited(MouseEvent event) {
-                if (button.isEnabled()) {
-                    button.setBackground(base);
-                }
-            }
-        });
         return button;
     }
 
@@ -585,6 +561,135 @@ public class LibraryFrame extends JFrame {
     }
 
     /**
+     * One reusable button that paints its own rounded background, because the
+     * Windows look and feel ignores JButton background colours.
+     *
+     * @author Syeda Momina Sherazi (534663), Muqaddus Habib (534742)
+     */
+    private static final class ThemedButton extends JButton {
+
+        /** Colour of the button in its normal state. */
+        private final Color normal;
+        /** Colour of the button while the mouse is over it. */
+        private final Color hover;
+        /** Colour of the button while it is pressed. */
+        private final Color pressed;
+        /** Whether the mouse is currently over the button. */
+        private boolean hovering;
+        /** Whether the mouse is currently pressing the button. */
+        private boolean pressing;
+
+        /**
+         * Creates a self-painting button with a fixed size and white bold text.
+         *
+         * @param text    the button label
+         * @param normal  the normal fill colour
+         * @param hover   the hover fill colour
+         * @param pressed the pressed fill colour
+         */
+        ThemedButton(String text, Color normal, Color hover, Color pressed) {
+            super(text);
+            this.normal = normal;
+            this.hover = hover;
+            this.pressed = pressed;
+            setPreferredSize(new Dimension(110, 34));
+            setFont(Theme.FONT.deriveFont(Font.BOLD));
+            setForeground(Color.WHITE);
+            setMargin(new Insets(6, 10, 6, 10));
+            setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
+            setContentAreaFilled(false);
+            setFocusPainted(false);
+            setBorderPainted(false);
+            setOpaque(false);
+            addMouseListener(new MouseAdapter() {
+                /**
+                 * Marks the button as hovered.
+                 *
+                 * @param event the mouse event
+                 */
+                @Override
+                public void mouseEntered(MouseEvent event) {
+                    hovering = true;
+                    repaint();
+                }
+
+                /**
+                 * Clears hover and pressed state when the mouse leaves.
+                 *
+                 * @param event the mouse event
+                 */
+                @Override
+                public void mouseExited(MouseEvent event) {
+                    hovering = false;
+                    pressing = false;
+                    repaint();
+                }
+
+                /**
+                 * Marks the button as pressed.
+                 *
+                 * @param event the mouse event
+                 */
+                @Override
+                public void mousePressed(MouseEvent event) {
+                    if (isEnabled()) {
+                        pressing = true;
+                        repaint();
+                    }
+                }
+
+                /**
+                 * Clears the pressed state.
+                 *
+                 * @param event the mouse event
+                 */
+                @Override
+                public void mouseReleased(MouseEvent event) {
+                    pressing = false;
+                    repaint();
+                }
+            });
+        }
+
+        /**
+         * Paints the rounded fill for normal, hover, pressed and disabled
+         * states, then lets Swing draw the label and mnemonic.
+         *
+         * @param g the graphics context
+         */
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D painter = (Graphics2D) g.create();
+            painter.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            if (!isEnabled()) {
+                painter.setColor(Theme.DISABLED_BUTTON);
+            } else if (pressing) {
+                painter.setColor(pressed);
+            } else if (hovering) {
+                painter.setColor(hover);
+            } else {
+                painter.setColor(normal);
+            }
+            painter.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 14, 14);
+            painter.dispose();
+            super.paintComponent(g);
+        }
+
+        /**
+         * Keeps the text readable when a row-disabled button changes state.
+         *
+         * @param enabled whether the button can be clicked
+         */
+        @Override
+        public void setEnabled(boolean enabled) {
+            super.setEnabled(enabled);
+            setForeground(enabled ? Color.WHITE : Theme.DISABLED_TEXT);
+            repaint();
+        }
+    }
+
+    /**
      * Stripes alternate rows and colour-codes the Status column.
      *
      * @author Syeda Momina Sherazi (534663), Muqaddus Habib (534742)
@@ -653,18 +758,32 @@ public class LibraryFrame extends JFrame {
         public static final Color BACKGROUND = new Color(245, 247, 250);
         /** Accent colour of the Add button. */
         public static final Color ACCENT = new Color(41, 98, 173);
-        /** Lighter accent shown while hovering the Add button. */
-        public static final Color ACCENT_HOVER = new Color(56, 126, 219);
+        /** Slightly darker accent shown while hovering the Add button. */
+        public static final Color ACCENT_HOVER = new Color(30, 82, 145);
+        /** Darkest accent shown while the Add button is pressed. */
+        public static final Color ACCENT_PRESSED = new Color(20, 60, 110);
+        /** Teal fill of the Update and Set Status buttons. */
+        public static final Color TEAL = new Color(20, 120, 120);
+        /** Slightly darker teal shown while hovering Update or Set Status. */
+        public static final Color TEAL_HOVER = new Color(16, 100, 100);
+        /** Darkest teal shown while Update or Set Status is pressed. */
+        public static final Color TEAL_PRESSED = new Color(12, 80, 80);
         /** Red-ish colour of the Delete button. */
         public static final Color DELETE = new Color(183, 55, 55);
-        /** Lighter red shown while hovering the Delete button. */
-        public static final Color DELETE_HOVER = new Color(214, 69, 69);
-        /** Neutral colour of the other action buttons. */
+        /** Slightly darker red shown while hovering the Delete button. */
+        public static final Color DELETE_HOVER = new Color(150, 42, 42);
+        /** Darkest red shown while the Delete button is pressed. */
+        public static final Color DELETE_PRESSED = new Color(115, 30, 30);
+        /** Neutral colour of the Clear button. */
         public static final Color NEUTRAL_BUTTON = new Color(90, 103, 117);
-        /** Lighter neutral shown while hovering the other buttons. */
-        public static final Color NEUTRAL_BUTTON_HOVER = new Color(112, 128, 145);
-        /** Grey background of disabled action buttons. */
-        public static final Color DISABLED_BUTTON = new Color(190, 195, 200);
+        /** Slightly darker neutral shown while hovering Clear. */
+        public static final Color NEUTRAL_BUTTON_HOVER = new Color(72, 84, 98);
+        /** Darkest neutral shown while Clear is pressed. */
+        public static final Color NEUTRAL_BUTTON_PRESSED = new Color(52, 62, 74);
+        /** Light grey fill of disabled buttons, so their shape stays visible. */
+        public static final Color DISABLED_BUTTON = new Color(217, 221, 227);
+        /** Mid-grey text of disabled buttons. */
+        public static final Color DISABLED_TEXT = new Color(105, 113, 124);
         /** Normal dark text colour. */
         public static final Color TEXT = new Color(33, 37, 41);
         /** Muted grey for small text and the empty-library message. */
