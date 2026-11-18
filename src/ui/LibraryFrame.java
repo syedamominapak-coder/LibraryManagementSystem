@@ -3,7 +3,9 @@ package ui;
 import app.AppInfo;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -21,6 +23,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 import model.Book;
 import model.BookStatus;
@@ -297,5 +300,113 @@ public class LibraryFrame extends JFrame {
         messageArea.setText("Error: " + e.getMessage());
         JOptionPane.showMessageDialog(this, e.getMessage(), "Library Error",
                 JOptionPane.ERROR_MESSAGE);
+    }
+
+    /**
+     * Single place for the GUI palette, fonts and look-and-feel setup.
+     *
+     * @author Syeda Momina Sherazi (534663), Muqaddus Habib (534742)
+     */
+    public static final class Theme {
+
+        /** Dark navy background of the header bar. */
+        public static final Color HEADER_BG = new Color(33, 45, 61);
+        /** Light text used for the header title. */
+        public static final Color HEADER_TITLE_FG = new Color(255, 255, 255);
+        /** Softer light text used for the members line in the header. */
+        public static final Color HEADER_MEMBERS_FG = new Color(190, 206, 224);
+        /** Light neutral background of the whole window. */
+        public static final Color BACKGROUND = new Color(245, 247, 250);
+        /** Accent colour of the Add button. */
+        public static final Color ACCENT = new Color(41, 98, 173);
+        /** Lighter accent shown while hovering the Add button. */
+        public static final Color ACCENT_HOVER = new Color(56, 126, 219);
+        /** Red-ish colour of the Delete button. */
+        public static final Color DELETE = new Color(183, 55, 55);
+        /** Lighter red shown while hovering the Delete button. */
+        public static final Color DELETE_HOVER = new Color(214, 69, 69);
+        /** Neutral colour of the other action buttons. */
+        public static final Color NEUTRAL_BUTTON = new Color(90, 103, 117);
+        /** Lighter neutral shown while hovering the other buttons. */
+        public static final Color NEUTRAL_BUTTON_HOVER = new Color(112, 128, 145);
+        /** Grey background of disabled action buttons. */
+        public static final Color DISABLED_BUTTON = new Color(190, 195, 200);
+        /** Normal dark text colour. */
+        public static final Color TEXT = new Color(33, 37, 41);
+        /** Muted grey for small text and the empty-library message. */
+        public static final Color MUTED = new Color(108, 117, 125);
+        /** Green colour for successful status-bar messages. */
+        public static final Color SUCCESS = new Color(25, 135, 84);
+        /** Red colour for error status-bar messages. */
+        public static final Color ERROR = new Color(200, 35, 51);
+        /** Background of the table header. */
+        public static final Color TABLE_HEADER_BG = new Color(222, 230, 240);
+        /** Background of every second table row. */
+        public static final Color ROW_ALT = new Color(236, 241, 247);
+        /** Background of AVAILABLE status cells. */
+        public static final Color AVAILABLE_BG = new Color(223, 245, 230);
+        /** Foreground of AVAILABLE status cells. */
+        public static final Color AVAILABLE_FG = new Color(20, 110, 60);
+        /** Background of ISSUED status cells. */
+        public static final Color ISSUED_BG = new Color(255, 235, 225);
+        /** Foreground of ISSUED status cells. */
+        public static final Color ISSUED_FG = new Color(170, 60, 20);
+        /** Background of RESERVED status cells. */
+        public static final Color RESERVED_BG = new Color(255, 245, 215);
+        /** Foreground of RESERVED status cells. */
+        public static final Color RESERVED_FG = new Color(140, 95, 10);
+        /** Standard spacing and padding used by every panel. */
+        public static final int PAD = 12;
+        /** Shared UI font: Segoe UI 13pt, or Dialog 13pt as fallback. */
+        public static final Font FONT = createFont();
+        /** Font of the header title. */
+        public static final Font HEADER_TITLE_FONT = FONT.deriveFont(Font.BOLD, 17f);
+        /** Font of the members line in the header. */
+        public static final Font HEADER_MEMBERS_FONT = FONT.deriveFont(Font.PLAIN, 12f);
+        /** Font of the centred empty-library message. */
+        public static final Font EMPTY_FONT = FONT.deriveFont(Font.BOLD, 22f);
+        /** Font of the bottom status bar. */
+        public static final Font STATUS_FONT = FONT.deriveFont(Font.BOLD, 12f);
+        /** Font of the small grey footer. */
+        public static final Font FOOTER_FONT = FONT.deriveFont(Font.PLAIN, 11f);
+
+        /**
+         * Prevents instantiation of this utility class.
+         */
+        private Theme() {
+        }
+
+        /**
+         * Selects the system look and feel, falling back to Nimbus and then
+         * silently to the platform default. Call before creating any window.
+         */
+        public static void applyLookAndFeel() {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception firstFailure) {
+                try {
+                    UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+                } catch (Exception secondFailure) {
+                    // Keep the default look and feel; the application still works.
+                }
+            }
+        }
+
+        /**
+         * Builds the shared font, preferring Segoe UI when it is installed.
+         *
+         * @return Segoe UI 13pt when available, otherwise Dialog 13pt
+         */
+        private static Font createFont() {
+            Font preferred = new Font("Segoe UI", Font.PLAIN, 13);
+            String[] families = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                    .getAvailableFontFamilyNames();
+            for (String family : families) {
+                if ("Segoe UI".equalsIgnoreCase(family)) {
+                    return preferred;
+                }
+            }
+            return new Font(Font.DIALOG, Font.PLAIN, 13);
+        }
     }
 }

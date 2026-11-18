@@ -26,6 +26,8 @@ public class Main {
         System.out.println("Group Members: " + AppInfo.MEMBERS);
         System.out.println("Launching the library window...");
 
+        LibraryFrame.Theme.applyLookAndFeel();
+
         EventQueue.invokeLater(() -> {
             LibraryFrame frame = new LibraryFrame();
             frame.setVisible(true);
