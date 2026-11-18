@@ -1,0 +1,13 @@
+﻿Group Members: Syeda Momina Sherazi (534663) | Muqaddus Habib (534742)
+Test Case | Expected Result | Actual Result | PASS/FAIL
+---------------------------------------------------------------------------------------------------
+1. Add a valid book                           | Book is added             | Book is added             | PASS
+2. Add a book with an empty title             | Validation message shown  | Validation message shown  | PASS
+3. Add a book with a duplicate ID             | Error message shown       | Error message shown       | PASS
+4. View all books                             | All books displayed       | All books displayed       | PASS
+5. View an empty library                      | Appropriate message shown | Appropriate message shown | PASS
+6. Update an existing book                    | Details updated           | Details updated           | PASS
+7. Update a non-existing book                 | Handled gracefully        | Handled gracefully        | PASS
+8. Delete an existing book                    | Book removed              | Book removed              | PASS
+---------------------------------------------------------------------------------------------------
+Total: 8/8 tests passed.
