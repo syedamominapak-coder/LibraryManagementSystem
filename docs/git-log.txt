@@ -1,5 +1,149 @@
 ﻿Group Members: Syeda Momina Sherazi (534663) | Muqaddus Habib (534742)
 # git log --oneline --graph --stat
+* a09c103 docs: refresh UI docs, Javadoc HTML and evidence for polished GUI
+|  README.md                                  |  20 +-
+|  docs/DEMO.md                               |  54 ++-
+|  docs/git-log.txt                           | 103 +++++
+|  docs/git-status.txt                        |  45 +-
+|  docs/javadoc/Main.html                     |   7 +-
+|  docs/javadoc/allclasses-index.html         |  24 +-
+|  docs/javadoc/allpackages-index.html        |   2 +-
+|  docs/javadoc/app/AppInfo.html              |   2 +-
+|  docs/javadoc/app/package-summary.html      |   2 +-
+|  docs/javadoc/app/package-tree.html         |   2 +-
+|  docs/javadoc/constant-values.html          |  19 +-
+|  docs/javadoc/help-doc.html                 |   2 +-
+|  docs/javadoc/index-all.html                | 155 ++++++-
+|  docs/javadoc/index.html                    |   2 +-
+|  docs/javadoc/member-search-index.js        |   2 +-
+|  docs/javadoc/model/Book.html               |   2 +-
+|  docs/javadoc/model/BookStatus.html         |   2 +-
+|  docs/javadoc/model/package-summary.html    |   2 +-
+|  docs/javadoc/model/package-tree.html       |   2 +-
+|  docs/javadoc/overview-summary.html         |   2 +-
+|  docs/javadoc/overview-tree.html            |   3 +-
+|  docs/javadoc/package-summary.html          |   7 +-
+|  docs/javadoc/package-tree.html             |   2 +-
+|  docs/javadoc/search.html                   |   2 +-
+|  docs/javadoc/serialized-form.html          |  43 +-
+|  docs/javadoc/service/LibraryException.html |   2 +-
+|  docs/javadoc/service/LibraryService.html   |   2 +-
+|  docs/javadoc/service/package-summary.html  |   2 +-
+|  docs/javadoc/service/package-tree.html     |   2 +-
+|  docs/javadoc/test/LibraryServiceTest.html  |   2 +-
+|  docs/javadoc/test/package-summary.html     |   2 +-
+|  docs/javadoc/test/package-tree.html        |   2 +-
+|  docs/javadoc/type-search-index.js          |   2 +-
+|  docs/javadoc/ui/LibraryFrame.Theme.html    | 643 +++++++++++++++++++++++++++
+|  docs/javadoc/ui/LibraryFrame.html          |  19 +-
+|  docs/javadoc/ui/package-summary.html       |   9 +-
+|  docs/javadoc/ui/package-tree.html          |   3 +-
+|  src/Main.java                              |   5 +-
+|  src/ui/LibraryFrame.java                   |   6 +-
+|  39 files changed, 1119 insertions(+), 90 deletions(-)
+* 9a1e431 feat: add live search, button states and colour status bar
+|  src/ui/LibraryFrame.java | 235 +++++++++++++++++++++++++++++++++++++++------
+|  1 file changed, 207 insertions(+), 28 deletions(-)
+* ae0d25e style: restyle table with status colours and nicer empty state
+|  src/ui/LibraryFrame.java | 90 ++++++++++++++++++++++++++++++++++++++++++++--
+|  1 file changed, 88 insertions(+), 2 deletions(-)
+* 2001ba3 style: redesign form layout with header bar and small grey footer
+|  src/ui/LibraryFrame.java | 121 +++++++++++++++++++++++++++++++++++----------
+|  1 file changed, 94 insertions(+), 27 deletions(-)
+* bae6226 style: add UI theme constants and apply system look and feel
+|  src/Main.java            |   2 +
+|  src/ui/LibraryFrame.java | 111 +++++++++++++++++++++++++++++++++++++++++++++
+|  2 files changed, 113 insertions(+)
+* d3b63a6 docs: generate Javadoc HTML, update README and add evidence files
+|  README.md                                         |   54 +-
+|  docs/DEMO.md                                      |   35 +
+|  docs/git-diff-example.txt                         |   16 +
+|  docs/git-log.txt                                  |   42 +
+|  docs/git-status.txt                               |   21 +
+|  docs/javadoc/Main.html                            |  158 ++
+|  docs/javadoc/allclasses-index.html                |  113 ++
+|  docs/javadoc/allpackages-index.html               |   88 +
+|  docs/javadoc/app/AppInfo.html                     |  164 ++
+|  docs/javadoc/app/package-summary.html             |  102 +
+|  docs/javadoc/app/package-tree.html                |   88 +
+|  docs/javadoc/constant-values.html                 |   97 +
+|  docs/javadoc/element-list                         |    6 +
+|  docs/javadoc/help-doc.html                        |  234 +++
+|  docs/javadoc/index-all.html                       |  256 +++
+|  docs/javadoc/index.html                           |   87 +
+|  docs/javadoc/legal/COPYRIGHT                      |   69 +
+|  docs/javadoc/legal/LICENSE                        |  118 ++
+|  docs/javadoc/legal/dejavufonts.md                 |  191 ++
+|  docs/javadoc/member-search-index.js               |    1 +
+|  docs/javadoc/model/Book.html                      |  319 ++++
+|  docs/javadoc/model/BookStatus.html                |  271 +++
+|  docs/javadoc/model/package-summary.html           |  108 ++
+|  docs/javadoc/model/package-tree.html              |  102 +
+|  docs/javadoc/module-search-index.js               |    1 +
+|  docs/javadoc/overview-summary.html                |   26 +
+|  docs/javadoc/overview-tree.html                   |  137 ++
+|  docs/javadoc/package-search-index.js              |    1 +
+|  docs/javadoc/package-summary.html                 |  100 +
+|  docs/javadoc/package-tree.html                    |   88 +
+|  docs/javadoc/resource-files/copy.svg              |   15 +
+|  docs/javadoc/resource-files/down.svg              |   12 +
+|  .../resource-files/fonts/DejaVuLGCSans-Bold.woff  |  Bin 0 -> 280908 bytes
+|  .../resource-files/fonts/DejaVuLGCSans-Bold.woff2 |  Bin 0 -> 193392 bytes
+|  .../fonts/DejaVuLGCSans-BoldOblique.woff          |  Bin 0 -> 276608 bytes
+|  .../fonts/DejaVuLGCSans-BoldOblique.woff2         |  Bin 0 -> 193548 bytes
+|  .../fonts/DejaVuLGCSans-Oblique.woff              |  Bin 0 -> 273920 bytes
+|  .../fonts/DejaVuLGCSans-Oblique.woff2             |  Bin 0 -> 192368 bytes
+|  .../resource-files/fonts/DejaVuLGCSans.woff       |  Bin 0 -> 300804 bytes
+|  .../resource-files/fonts/DejaVuLGCSans.woff2      |  Bin 0 -> 208088 bytes
+|  .../fonts/DejaVuLGCSansMono-Bold.woff             |  Bin 0 -> 166156 bytes
+|  .../fonts/DejaVuLGCSansMono-Bold.woff2            |  Bin 0 -> 120496 bytes
+|  .../fonts/DejaVuLGCSansMono-BoldOblique.woff      |  Bin 0 -> 131976 bytes
+|  .../fonts/DejaVuLGCSansMono-BoldOblique.woff2     |  Bin 0 -> 93508 bytes
+|  .../fonts/DejaVuLGCSansMono-Oblique.woff          |  Bin 0 -> 131844 bytes
+|  .../fonts/DejaVuLGCSansMono-Oblique.woff2         |  Bin 0 -> 94024 bytes
+|  .../resource-files/fonts/DejaVuLGCSansMono.woff   |  Bin 0 -> 170212 bytes
+|  .../resource-files/fonts/DejaVuLGCSansMono.woff2  |  Bin 0 -> 123560 bytes
+|  .../resource-files/fonts/DejaVuLGCSerif-Bold.woff |  Bin 0 -> 167488 bytes
+|  .../fonts/DejaVuLGCSerif-Bold.woff2               |  Bin 0 -> 112512 bytes
+|  .../fonts/DejaVuLGCSerif-BoldItalic.woff          |  Bin 0 -> 165488 bytes
+|  .../fonts/DejaVuLGCSerif-BoldItalic.woff2         |  Bin 0 -> 113032 bytes
+|  .../fonts/DejaVuLGCSerif-Italic.woff              |  Bin 0 -> 166552 bytes
+|  .../fonts/DejaVuLGCSerif-Italic.woff2             |  Bin 0 -> 113988 bytes
+|  .../resource-files/fonts/DejaVuLGCSerif.woff      |  Bin 0 -> 186428 bytes
+|  .../resource-files/fonts/DejaVuLGCSerif.woff2     |  Bin 0 -> 127416 bytes
+|  docs/javadoc/resource-files/fonts/dejavu.css      |  104 +
+|  docs/javadoc/resource-files/glass.svg             |   13 +
+|  docs/javadoc/resource-files/left.svg              |   12 +
+|  docs/javadoc/resource-files/link.svg              |   13 +
+|  docs/javadoc/resource-files/moon.svg              |   15 +
+|  docs/javadoc/resource-files/right.svg             |   12 +
+|  docs/javadoc/resource-files/sort-a-z.svg          |   16 +
+|  docs/javadoc/resource-files/stylesheet.css        | 1874 +++++++++++++++++++
+|  docs/javadoc/resource-files/sun.svg               |   22 +
+|  docs/javadoc/resource-files/x.svg                 |   13 +
+|  docs/javadoc/script-files/script.js               |  838 +++++++++
+|  docs/javadoc/script-files/search.js               |  906 +++++++++
+|  docs/javadoc/search.html                          |   81 +
+|  docs/javadoc/serialized-form.html                 |  153 ++
+|  docs/javadoc/service/LibraryException.html        |  175 ++
+|  docs/javadoc/service/LibraryService.html          |  323 ++++
+|  docs/javadoc/service/package-summary.html         |  108 ++
+|  docs/javadoc/service/package-tree.html            |   97 +
+|  docs/javadoc/tag-search-index.js                  |    1 +
+|  docs/javadoc/test/LibraryServiceTest.html         |  158 ++
+|  docs/javadoc/test/package-summary.html            |  102 +
+|  docs/javadoc/test/package-tree.html               |   88 +
+|  docs/javadoc/type-search-index.js                 |    1 +
+|  docs/javadoc/ui/LibraryFrame.html                 |  234 +++
+|  docs/javadoc/ui/package-summary.html              |  102 +
+|  docs/javadoc/ui/package-tree.html                 |  108 ++
+|  javadoc.bat                                       |   17 +
+|  javadoc.sh                                        |   15 +
+|  run.bat                                           |    8 +
+|  run.sh                                            |   15 +
+|  test.bat                                          |    8 +
+|  test.sh                                           |   15 +
+|  88 files changed, 8749 insertions(+), 18 deletions(-)
 * 2b488ea fix: clarify duplicate-ID validation message
 |  src/service/LibraryService.java | 2 +-
 |  1 file changed, 1 insertion(+), 1 deletion(-)

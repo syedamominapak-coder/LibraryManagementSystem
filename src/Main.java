@@ -3,8 +3,9 @@ import java.awt.EventQueue;
 import ui.LibraryFrame;
 
 /**
- * Application entry point that prints the group members and launches the Swing
- * window on the Event Dispatch Thread.
+ * Application entry point that prints the group members, applies the system
+ * look and feel and launches the themed Swing window on the Event Dispatch
+ * Thread.
  *
  * @author Syeda Momina Sherazi (534663), Muqaddus Habib (534742)
  */

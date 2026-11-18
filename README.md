@@ -27,7 +27,7 @@ src/
   model/BookStatus.java         # AVAILABLE, ISSUED, RESERVED
   service/LibraryService.java   # in-memory business logic
   service/LibraryException.java # checked validation / not-found error
-  ui/LibraryFrame.java          # Swing GUI
+  ui/LibraryFrame.java          # Swing GUI + Theme palette/nested renderer
   test/LibraryServiceTest.java  # plain-Java test runner (8 cases)
 docs/                           # generated Javadoc and evidence files
 run.sh / run.bat                # compile and launch
@@ -38,6 +38,24 @@ javadoc.sh / javadoc.bat        # generate Javadoc HTML
 `AppInfo` lives in the `app` package so that classes in `model`, `service`,
 `ui`, and `test` can all reuse `AppInfo.MEMBERS`. `Main` stays in the default
 package so the application can be launched with `java -cp out Main`.
+
+## GUI features
+
+- System look and feel (Nimbus fallback) applied before the window is built.
+- Dark header with the title and the members line; small grey footer with both
+  members and IDs.
+- GridBagLayout form with equal-width fields, 12px padding and a 900x600 minimum
+  window size; the window resizes cleanly.
+- Themed buttons: consistent font/size, hover colours, tooltips and mnemonics
+  (Alt+A Add, Alt+U Update, Alt+D Delete). Delete is red, Add is blue.
+- Table with 28px rows, bold coloured header, alternating rows and colour-coded
+  statuses (green AVAILABLE, orange/red ISSUED, amber RESERVED).
+- Live search above the table filters by ID, title or author; the empty message
+  becomes "No matching books" when a filter hides everything.
+- Update / Delete / Set Status stay disabled until a table row is selected;
+  selecting a row fills the form, and Clear also clears the selection.
+- Slim bottom status bar shows the last message in green (success) or red
+  (error), alongside `JOptionPane` error dialogs.
 
 ## Compile
 

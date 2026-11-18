@@ -4,18 +4,37 @@ On branch main
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
-	modified:   README.md
-
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-	docs/DEMO.md
-	docs/git-diff-example.txt
-	docs/javadoc/
-	javadoc.bat
-	javadoc.sh
-	run.bat
-	run.sh
-	test.bat
-	test.sh
+	modified:   docs/javadoc/Main.html
+	modified:   docs/javadoc/allclasses-index.html
+	modified:   docs/javadoc/allpackages-index.html
+	modified:   docs/javadoc/app/AppInfo.html
+	modified:   docs/javadoc/app/package-summary.html
+	modified:   docs/javadoc/app/package-tree.html
+	modified:   docs/javadoc/constant-values.html
+	modified:   docs/javadoc/help-doc.html
+	modified:   docs/javadoc/index-all.html
+	modified:   docs/javadoc/index.html
+	modified:   docs/javadoc/model/Book.html
+	modified:   docs/javadoc/model/BookStatus.html
+	modified:   docs/javadoc/model/package-summary.html
+	modified:   docs/javadoc/model/package-tree.html
+	modified:   docs/javadoc/overview-summary.html
+	modified:   docs/javadoc/overview-tree.html
+	modified:   docs/javadoc/package-summary.html
+	modified:   docs/javadoc/package-tree.html
+	modified:   docs/javadoc/search.html
+	modified:   docs/javadoc/serialized-form.html
+	modified:   docs/javadoc/service/LibraryException.html
+	modified:   docs/javadoc/service/LibraryService.html
+	modified:   docs/javadoc/service/package-summary.html
+	modified:   docs/javadoc/service/package-tree.html
+	modified:   docs/javadoc/test/LibraryServiceTest.html
+	modified:   docs/javadoc/test/package-summary.html
+	modified:   docs/javadoc/test/package-tree.html
+	modified:   docs/javadoc/ui/LibraryFrame.Theme.html
+	modified:   docs/javadoc/ui/LibraryFrame.html
+	modified:   docs/javadoc/ui/package-summary.html
+	modified:   docs/javadoc/ui/package-tree.html
+	modified:   src/ui/LibraryFrame.java
 
 no changes added to commit (use "git add" and/or "git commit -a")

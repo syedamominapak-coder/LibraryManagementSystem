@@ -42,8 +42,10 @@ import service.LibraryException;
 import service.LibraryService;
 
 /**
- * Swing window for adding, viewing, updating, deleting and issuing books. The
- * window title and footer both show the names and IDs of the group members.
+ * Polished Swing window for adding, viewing, updating, deleting and issuing
+ * books. It has a dark header, a themed table with colour-coded statuses, a
+ * live search field, a colour-coded status bar and a footer that shows both
+ * group members and their IDs.
  *
  * @author Syeda Momina Sherazi (534663), Muqaddus Habib (534742)
  */
@@ -189,7 +191,7 @@ public class LibraryFrame extends JFrame {
         statusCombo.setFont(Theme.FONT);
 
         GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(6, Theme.PAD, 6, Theme.PAD);
+        c.insets = new Insets(10, Theme.PAD, 10, Theme.PAD);
         c.anchor = GridBagConstraints.WEST;
 
         JLabel section = new JLabel("Book details");
@@ -298,7 +300,7 @@ public class LibraryFrame extends JFrame {
         JLabel searchLabel = new JLabel("Search:");
         searchLabel.setFont(Theme.FONT);
         searchLabel.setForeground(Theme.TEXT);
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, Theme.PAD, 6));
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, Theme.PAD, 10));
         searchPanel.setBackground(Theme.BACKGROUND);
         searchPanel.add(searchLabel);
         searchPanel.add(searchField);
@@ -340,7 +342,7 @@ public class LibraryFrame extends JFrame {
      * @return the configured bottom panel
      */
     private JPanel buildBottomPanel() {
-        JPanel panel = new JPanel(new BorderLayout(5, 5));
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBackground(Theme.BACKGROUND);
         panel.setBorder(BorderFactory.createEmptyBorder(
                 0, Theme.PAD, Theme.PAD, Theme.PAD));
