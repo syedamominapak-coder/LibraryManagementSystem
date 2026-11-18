@@ -4,6 +4,7 @@ import app.AppInfo;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
@@ -13,6 +14,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -76,11 +78,17 @@ public class LibraryFrame extends JFrame {
      */
     public LibraryFrame() {
         setTitle("Library Book Management System - " + AppInfo.MEMBERS);
-        setSize(950, 600);
+        setSize(950, 650);
+        setMinimumSize(new Dimension(900, 600));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        getContentPane().setBackground(Theme.BACKGROUND);
 
-        add(buildInputPanel(), BorderLayout.NORTH);
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(Theme.BACKGROUND);
+        topPanel.add(buildHeaderPanel(), BorderLayout.NORTH);
+        topPanel.add(buildInputPanel(), BorderLayout.CENTER);
+        add(topPanel, BorderLayout.NORTH);
         add(buildTablePanel(), BorderLayout.CENTER);
         add(buildBottomPanel(), BorderLayout.SOUTH);
 
@@ -91,6 +99,30 @@ public class LibraryFrame extends JFrame {
     }
 
     /**
+     * Creates the dark header bar with the application title and the members
+     * line in lighter text.
+     *
+     * @return the configured header panel
+     */
+    private JPanel buildHeaderPanel() {
+        JPanel header = new JPanel(new BorderLayout(0, 2));
+        header.setBackground(Theme.HEADER_BG);
+        header.setBorder(BorderFactory.createEmptyBorder(
+                Theme.PAD, Theme.PAD, Theme.PAD, Theme.PAD));
+
+        JLabel title = new JLabel("Library Book Management System");
+        title.setFont(Theme.HEADER_TITLE_FONT);
+        title.setForeground(Theme.HEADER_TITLE_FG);
+        header.add(title, BorderLayout.WEST);
+
+        JLabel members = new JLabel(AppInfo.MEMBERS);
+        members.setFont(Theme.HEADER_MEMBERS_FONT);
+        members.setForeground(Theme.HEADER_MEMBERS_FG);
+        header.add(members, BorderLayout.SOUTH);
+        return header;
+    }
+
+    /**
      * Creates the form with input fields, the status combo box and the
      * Add, Update, Delete, Set Status and Clear buttons.
      *
@@ -98,46 +130,75 @@ public class LibraryFrame extends JFrame {
      */
     private JPanel buildInputPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createTitledBorder("Book details"));
+        panel.setBackground(Theme.BACKGROUND);
+        panel.setBorder(BorderFactory.createEmptyBorder(
+                Theme.PAD, Theme.PAD, Theme.PAD, Theme.PAD));
+
+        Dimension fieldSize = new Dimension(170, 30);
+        idField.setPreferredSize(fieldSize);
+        titleField.setPreferredSize(fieldSize);
+        authorField.setPreferredSize(fieldSize);
+        statusCombo.setPreferredSize(fieldSize);
+        idField.setFont(Theme.FONT);
+        titleField.setFont(Theme.FONT);
+        authorField.setFont(Theme.FONT);
+        statusCombo.setFont(Theme.FONT);
+
         GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(5, 5, 5, 5);
+        c.insets = new Insets(6, Theme.PAD, 6, Theme.PAD);
         c.anchor = GridBagConstraints.WEST;
 
+        JLabel section = new JLabel("Book details");
+        section.setFont(Theme.FONT.deriveFont(Font.BOLD));
+        section.setForeground(Theme.TEXT);
         c.gridx = 0;
         c.gridy = 0;
-        panel.add(new JLabel("Book ID:"), c);
-        c.gridx = 1;
-        panel.add(idField, c);
-        c.gridx = 2;
-        panel.add(new JLabel("Status:"), c);
-        c.gridx = 3;
-        panel.add(statusCombo, c);
+        c.gridwidth = 4;
+        panel.add(section, c);
+        c.gridwidth = 1;
 
-        c.gridx = 0;
-        c.gridy = 1;
-        panel.add(new JLabel("Title:"), c);
-        c.gridx = 1;
-        panel.add(titleField, c);
-
-        c.gridx = 0;
-        c.gridy = 2;
-        panel.add(new JLabel("Author:"), c);
-        c.gridx = 1;
-        panel.add(authorField, c);
+        addLabelledField(panel, c, 0, 1, "Book ID:", idField);
+        addLabelledField(panel, c, 2, 1, "Status:", statusCombo);
+        addLabelledField(panel, c, 0, 2, "Title:", titleField);
+        addLabelledField(panel, c, 2, 2, "Author:", authorField);
 
         JPanel buttons = new JPanel();
+        buttons.setOpaque(false);
         buttons.add(makeButton("Add", event -> addBook()));
         buttons.add(makeButton("Update", event -> updateBook()));
         buttons.add(makeButton("Delete", event -> deleteBook()));
         buttons.add(makeButton("Set Status", event -> setStatus()));
         buttons.add(makeButton("Clear", event -> clearForm()));
-        c.gridx = 2;
-        c.gridy = 1;
-        c.gridwidth = 2;
-        c.gridheight = 2;
-        c.fill = GridBagConstraints.BOTH;
+        c.gridx = 0;
+        c.gridy = 3;
+        c.gridwidth = 4;
+        c.anchor = GridBagConstraints.EAST;
         panel.add(buttons, c);
         return panel;
+    }
+
+    /**
+     * Adds one label and its field to the form grid.
+     *
+     * @param panel the form panel
+     * @param c     shared grid constraints
+     * @param x     column of the label
+     * @param y     row of the label and field
+     * @param text  text of the label
+     * @param field the field placed in the next column
+     */
+    private void addLabelledField(JPanel panel, GridBagConstraints c, int x, int y,
+                                  String text, JComponent field) {
+        JLabel label = new JLabel(text);
+        label.setFont(Theme.FONT);
+        label.setForeground(Theme.TEXT);
+        c.gridx = x;
+        c.gridy = y;
+        c.fill = GridBagConstraints.NONE;
+        panel.add(label, c);
+        c.gridx = x + 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(field, c);
     }
 
     /**
@@ -162,13 +223,19 @@ public class LibraryFrame extends JFrame {
      */
     private JPanel buildBottomPanel() {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setBackground(Theme.BACKGROUND);
+        panel.setBorder(BorderFactory.createEmptyBorder(
+                0, Theme.PAD, Theme.PAD, Theme.PAD));
         messageArea.setEditable(false);
+        messageArea.setFont(Theme.FONT);
         messageArea.setLineWrap(true);
         messageArea.setWrapStyleWord(true);
         messageArea.setBorder(BorderFactory.createTitledBorder("Messages"));
         panel.add(new JScrollPane(messageArea), BorderLayout.CENTER);
 
         JLabel footer = new JLabel("Group Members: " + AppInfo.MEMBERS, SwingConstants.CENTER);
+        footer.setFont(Theme.FOOTER_FONT);
+        footer.setForeground(Theme.MUTED);
         panel.add(footer, BorderLayout.SOUTH);
         return panel;
     }
