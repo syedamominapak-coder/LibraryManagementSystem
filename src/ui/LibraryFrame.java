@@ -4,6 +4,7 @@ import app.AppInfo;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
@@ -26,6 +27,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import model.Book;
 import model.BookStatus;
@@ -39,6 +41,9 @@ import service.LibraryService;
  * @author Syeda Momina Sherazi (534663), Muqaddus Habib (534742)
  */
 public class LibraryFrame extends JFrame {
+
+    /** Index of the Status column in the book table. */
+    private static final int STATUS_COLUMN = 3;
 
     /** In-memory business logic used by all buttons. */
     private final LibraryService service = new LibraryService();
@@ -70,6 +75,8 @@ public class LibraryFrame extends JFrame {
     private final JTable table = new JTable(tableModel);
     /** Card panel that swaps the table with the empty-library label. */
     private final JPanel tablePanel = new JPanel(new CardLayout());
+    /** Centred message shown when the table has no rows. */
+    private final JLabel emptyLabel = new JLabel("Library is empty", SwingConstants.CENTER);
     /** Area used for success messages and friendly errors. */
     private final JTextArea messageArea = new JTextArea(3, 40);
 
@@ -93,6 +100,7 @@ public class LibraryFrame extends JFrame {
         add(buildBottomPanel(), BorderLayout.SOUTH);
 
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        styleTable();
         table.getSelectionModel().addListSelectionListener(event -> loadSelectedBook());
         updateTable();
         showMessage("Library is empty. Add your first book using the form above.");
@@ -209,11 +217,37 @@ public class LibraryFrame extends JFrame {
      */
     private JPanel buildTablePanel() {
         JScrollPane scrollPane = new JScrollPane(table);
-        JLabel emptyLabel = new JLabel("Library is empty", SwingConstants.CENTER);
-        emptyLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 22));
+        scrollPane.getViewport().setBackground(Color.WHITE);
+        emptyLabel.setFont(Theme.EMPTY_FONT);
+        emptyLabel.setForeground(Theme.MUTED);
+        tablePanel.setBackground(Theme.BACKGROUND);
         tablePanel.add(scrollPane, "table");
         tablePanel.add(emptyLabel, "empty");
         return tablePanel;
+    }
+
+    /**
+     * Applies the row height, header style, column widths and custom renderer
+     * to the book table.
+     */
+    private void styleTable() {
+        table.setRowHeight(28);
+        table.setFont(Theme.FONT);
+        table.setBackground(Color.WHITE);
+        table.setForeground(Theme.TEXT);
+        table.setGridColor(new Color(225, 230, 235));
+        table.setSelectionBackground(new Color(205, 222, 245));
+        table.setSelectionForeground(Theme.TEXT);
+        table.setDefaultRenderer(Object.class, new StatusCellRenderer());
+
+        table.getTableHeader().setFont(Theme.FONT.deriveFont(Font.BOLD));
+        table.getTableHeader().setBackground(Theme.TABLE_HEADER_BG);
+        table.getTableHeader().setForeground(Theme.TEXT);
+        table.getTableHeader().setReorderingAllowed(false);
+        table.getColumnModel().getColumn(0).setPreferredWidth(100);
+        table.getColumnModel().getColumn(1).setPreferredWidth(240);
+        table.getColumnModel().getColumn(2).setPreferredWidth(190);
+        table.getColumnModel().getColumn(STATUS_COLUMN).setPreferredWidth(120);
     }
 
     /**
@@ -367,6 +401,58 @@ public class LibraryFrame extends JFrame {
         messageArea.setText("Error: " + e.getMessage());
         JOptionPane.showMessageDialog(this, e.getMessage(), "Library Error",
                 JOptionPane.ERROR_MESSAGE);
+    }
+
+    /**
+     * Stripes alternate rows and colour-codes the Status column.
+     *
+     * @author Syeda Momina Sherazi (534663), Muqaddus Habib (534742)
+     */
+    private static final class StatusCellRenderer extends DefaultTableCellRenderer {
+
+        /**
+         * Builds a cell renderer with row stripes and status colours.
+         *
+         * @param table    the table being rendered
+         * @param value    the value of the current cell
+         * @param isSelected whether the row is selected
+         * @param hasFocus  whether the cell has focus
+         * @param row      the row index
+         * @param column   the column index
+         * @return the configured renderer component
+         */
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus,
+                                                       int row, int column) {
+            Component component = super.getTableCellRendererComponent(
+                    table, value, isSelected, hasFocus, row, column);
+            if (!isSelected) {
+                Color background = (row % 2 == 0) ? Color.WHITE : Theme.ROW_ALT;
+                Color foreground = Theme.TEXT;
+                if (column == STATUS_COLUMN && value instanceof BookStatus) {
+                    switch ((BookStatus) value) {
+                        case AVAILABLE:
+                            background = Theme.AVAILABLE_BG;
+                            foreground = Theme.AVAILABLE_FG;
+                            break;
+                        case ISSUED:
+                            background = Theme.ISSUED_BG;
+                            foreground = Theme.ISSUED_FG;
+                            break;
+                        case RESERVED:
+                            background = Theme.RESERVED_BG;
+                            foreground = Theme.RESERVED_FG;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                component.setBackground(background);
+                component.setForeground(foreground);
+            }
+            return component;
+        }
     }
 
     /**
