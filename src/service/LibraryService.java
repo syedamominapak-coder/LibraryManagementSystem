@@ -49,7 +49,7 @@ public class LibraryService {
             throw new LibraryException("Author must not be empty. Please enter an author.");
         }
         if (books.containsKey(cleanId)) {
-            throw new LibraryException("A book with ID '" + cleanId + "' already exists. Use a unique ID.");
+            throw new LibraryException("A book with ID '" + cleanId + "' already exists. Please use a different, unique ID.");
         }
 
         books.put(cleanId, new Book(cleanId, cleanTitle, cleanAuthor));
