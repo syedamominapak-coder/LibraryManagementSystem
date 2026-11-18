@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import model.Book;
+import model.BookStatus;
 
 /** In-memory business logic for the library. Contains no GUI code. */
 public class LibraryService {
@@ -68,5 +69,16 @@ public class LibraryService {
             throw new LibraryException("No book found with ID '" + id + "'. Nothing was deleted.");
         }
         books.remove(book.getId());
+    }
+
+    public void setStatus(String id, BookStatus status) throws LibraryException {
+        Book book = findById(id);
+        if (book == null) {
+            throw new LibraryException("No book found with ID '" + id + "'. Status was not changed.");
+        }
+        if (status == null) {
+            throw new LibraryException("Please choose a status: AVAILABLE, ISSUED or RESERVED.");
+        }
+        book.setStatus(status);
     }
 }
